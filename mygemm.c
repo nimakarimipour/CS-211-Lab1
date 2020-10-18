@@ -137,13 +137,19 @@ void ijk(const double *A, const double *B, double *C, const int n){
 }
 
 void bijk(const double *A, const double *B, double *C, const int n, const int b) {
-	for(int i=0;i<n;i+=b){
-		for(int j=0;j<n;j+=b){
-			for(int k=0;k<n;k+=b){
-				for(int iB=i;iB<i+b && iB<n;iB++){
-					for(int jB=j;jB<j+b && jB<n;jB++){
+    int i = 0;
+    int j = 0;
+    int k = 0;
+	for(i=0;i<n;i+=b){
+		for(j=0;j<n;j+=b){
+			for(k=0;k<n;k+=b){
+                int iB = i;
+				for(iB=i;iB<i+b && iB<n;iB++){
+                    int jB = j;
+					for(jB=j;jB<j+b && jB<n;jB++){
 						register double res=C[iB*n+jB];
-						for(int kB=k;kB<k+b && kB<n;kB++){
+                        int kB = k;
+						for(kB=k;kB<k+b && kB<n;kB++){
 							res+=A[iB*n+kB]*B[kB*n+jB];
                         }
 					    C[iB*n+jB]=res;
@@ -155,10 +161,13 @@ void bijk(const double *A, const double *B, double *C, const int n, const int b)
 }
 
 void jik(const double *A, const double *B, double *C, const int n) {
-    for(int j=0;j<n;j++){
-        for(int i=0;i<n;i++){
+    int j = 0;
+    int i = 0;
+    int k = 0;
+    for(j=0;j<n;j++){
+        for(i=0;i<n;i++){
 			register double res=0;
-			for(int k=0;k<n;k++){
+			for(k=0;k<n;k++){
 				res+=A[i*n+k]*B[k*n+j];
 			}
 			C[i*n+j]=res;
@@ -167,13 +176,19 @@ void jik(const double *A, const double *B, double *C, const int n) {
 }
 
 void bjik(const double *A, const double *B, double *C, const int n, const int b) {
-    for(int j=0;j<n;j+=b){
-		for(int i=0;i<n;i+=b){	
-			for(int k=0;k<n;k+=b){
-				for(int jB=j;jB<j+b && jB<n;jB++){
-					for(int iB=i;iB<i+b && iB<n;iB++){
+    int j = 0;
+    int i = 0;
+    int k = 0;
+    for(j=0;j<n;j+=b){
+		for(i=0;i<n;i+=b){	
+			for(k=0;k<n;k+=b){
+                int jB = j;
+				for(jB=j;jB<j+b && jB<n;jB++){
+                    int iB = i;
+					for(iB=i;iB<i+b && iB<n;iB++){
 						register double res=C[iB*n+jB];
-						for(int kB=k;kB<k+b && kB<n;kB++){
+                        int kB = k;
+						for(kB=k;kB<k+b && kB<n;kB++){
 							res+=A[iB*n+kB]*B[kB*n+jB];
                         }
 						C[iB*n+jB]=res;
@@ -185,10 +200,13 @@ void bjik(const double *A, const double *B, double *C, const int n, const int b)
 }
 
 void kij(const double *A, const double *B, double *C, const int n) {
-    for(int k=0;k<n;k++){
-		for(int i=0;i<n;i++){
+    int j = 0;
+    int i = 0;
+    int k = 0;
+    for(k=0;k<n;k++){
+		for(i=0;i<n;i++){
 			register double res=A[i*n+k];
-			for(int j=0;j<n;j++){
+			for(j=0;j<n;j++){
 				C[i*n+j]+=res*B[k*n+j];
 			}
 		}
@@ -196,13 +214,19 @@ void kij(const double *A, const double *B, double *C, const int n) {
 }
 
 void bkij(const double *A, const double *B, double *C, const int n, const int b) {
-    for(int k=0;k<n;k+=b){
-		for(int i=0;i<n;i+=b){	
-			for(int j=0;j<n;j+=b){
-				for(int kB=k;kB<k+b && kB<n;kB++){
-					for(int iB=i;iB<i+b && iB<n;iB++){
+    int j = 0;
+    int i = 0;
+    int k = 0;
+    for(k=0;k<n;k+=b){
+		for(i=0;i<n;i+=b){	
+			for(j=0;j<n;j+=b){
+                int kB = k;
+				for(kB=k;kB<k+b && kB<n;kB++){
+                    int iB = i;
+					for(iB=i;iB<i+b && iB<n;iB++){
 						register double res=A[iB*n+kB];
-						for(int jB=j;jB<j+b && jB<n;jB++){
+                        int jB = j;
+						for(jB=j;jB<j+b && jB<n;jB++){
 							C[iB*n+jB]+=res*B[kB*n+jB];
                         }
 					}
@@ -214,6 +238,9 @@ void bkij(const double *A, const double *B, double *C, const int n, const int b)
 
 
 void ikj(const double *A, const double *B, double *C, const int n) {
+    int j = 0;
+    int i = 0;
+    int k = 0;
     for(int k=0;k<n;k++){
 		for(int i=0;i<n;i++){
 			register double res=A[i*n+k];
@@ -225,13 +252,19 @@ void ikj(const double *A, const double *B, double *C, const int n) {
 }
 
 void bikj(const double *A, const double *B, double *C, const int n, const int b) {
-    for(int i=0;i<n;i+=b){
-		for(int k=0;k<n;k+=b){	
-			for(int j=0;j<n;j+=b){
-				for(int iB=i;iB<i+b && iB<n;iB++){
-					for(int kB=k;kB<k+b && kB<n;kB++){
+    int j = 0;
+    int i = 0;
+    int k = 0;
+    for(i=0;i<n;i+=b){
+		for(k=0;k<n;k+=b){	
+			for(j=0;j<n;j+=b){
+                int iB = i;
+				for(iB=i;iB<i+b && iB<n;iB++){
+                    int kB = k;
+					for(kB=k;kB<k+b && kB<n;kB++){
 						register double res=A[iB*n+kB];
-						for(int jB=j;jB<j+b && jB<n;jB++){
+                        int jB = j;
+						for(jB=j;jB<j+b && jB<n;jB++){
 							C[iB*n+jB]+=res*B[kB*n+jB];
                         }
 					}
@@ -242,6 +275,9 @@ void bikj(const double *A, const double *B, double *C, const int n, const int b)
 }
 
 void jki(const double *A, const double *B, double *C, const int n) {
+    int j = 0;
+    int i = 0;
+    int k = 0;
     for(int j=0;j<n;j++){
 		for(int k=0;k<n;k++){
 			register double res=B[k*n+j];
@@ -253,13 +289,19 @@ void jki(const double *A, const double *B, double *C, const int n) {
 }
 
 void bjki(const double *A, const double *B, double *C, const int n, const int b) {
-    for(int j=0;j<n;j+=b){
-		for(int k=0;k<n;k+=b){
-			for(int i=0;i<n;i+=b){
-				for(int jB=j;jB<j+b && jB<n;jB++){
-					for(int kB=k;kB<k+b && kB<n;kB++){
+    int j = 0;
+    int i = 0;
+    int k = 0;
+    for(j=0;j<n;j+=b){
+		for(k=0;k<n;k+=b){
+			for(i=0;i<n;i+=b){
+                int jB = j;
+				for(jB=j;jB<j+b && jB<n;jB++){
+                    int kB = k;
+					for(kB=k;kB<k+b && kB<n;kB++){
 						register double res=B[kB*n+jB];
-						for(int iB=i;iB<i+b && iB<n;iB++){
+                        int iB = i;
+						for(iB=i;iB<i+b && iB<n;iB++){
 							C[iB*n+jB]+=res*A[iB*n+kB];
                         }
 					}
@@ -270,6 +312,9 @@ void bjki(const double *A, const double *B, double *C, const int n, const int b)
 }
 
 void kji(const double *A, const double *B, double *C, const int n) {
+    int j = 0;
+    int i = 0;
+    int k = 0;
     for(int j=0;j<n;j++){
 		for(int k=0;k<n;k++){
 			register double res=B[k*n+j];
@@ -281,13 +326,19 @@ void kji(const double *A, const double *B, double *C, const int n) {
 }
 
 void bkji(const double *A, const double *B, double *C, const int n, const int b) {
-    for(int k=0;k<n;k+=b){
-		for(int j=0;j<n;j+=b){	
-			for(int i=0;i<n;i+=b){
-				for(int kB=k;kB<k+b && kB<n;kB++){
-					for(int jB=j;jB<j+b && jB<n;jB++){
+    int j = 0;
+    int i = 0;
+    int k = 0;
+    for(k=0;k<n;k+=b){
+		for(j=0;j<n;j+=b){	
+			for(i=0;i<n;i+=b){
+                int kB = k;
+				for(kB=k;kB<k+b && kB<n;kB++){
+                    int jB = j;
+					for(jB=j;jB<j+b && jB<n;jB++){
 						register double res=B[kB*n+jB];
-						for(int iB=i;iB<i+b && iB<n;iB++){
+                        int iB = i;
+						for(iB=i;iB<i+b && iB<n;iB++){
 							C[iB*n+jB]+=res*A[iB*n+kB];
                         }
 					}
