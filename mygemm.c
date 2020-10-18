@@ -10,12 +10,26 @@
 //Register Reuse part 1
 void dgemm0(const double* A, const double* B, double* C, const int n)
 {
-
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    for (i=0; i<n; i++)
+    for (j=0; j<n; j++)
+    for (k=0; k<n; k++)
+        C[i*n+j] += A[i*n+k] * B[k*n+j];
 }
 
 void dgemm1(const double *A, const double *B, double *C, const int n) 
 {
-
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    for (i=0; i<n; i++)
+    for (j=0; j<n; j++) {
+        register double r = C[i*n+j]; 
+        for (k=0; k<n; k++)
+        r += A[i*n+k] * B[k*n+j]; C[i*n+j] = r;
+    }
 }
 //Register Reuse part 1 End
 
