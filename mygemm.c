@@ -31,8 +31,9 @@ void dgemm1(const double *A, const double *B, double *C, const int n)
         for (j=0; j<n; j++) {
             register double r = C[i*n+j]; 
             for (k=0; k<n; k++){
-                r += A[i*n+k] * B[k*n+j]; C[i*n+j] = r;
+                r += A[i*n+k] * B[k*n+j]; 
             }
+            C[i*n+j] = r;
         }
     }
 }
