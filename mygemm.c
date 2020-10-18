@@ -41,10 +41,13 @@ void dgemm1(const double *A, const double *B, double *C, const int n)
 
 //Register Reuse part 2
 void dgemm2(const double *A, const double *B, double *C, const int n) {
-    for(int i=0;i<n;i+=2){
-		for(int j=0;j<n;j+=2){
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    for(i=0;i<n;i+=2){
+		for(j=0;j<n;j+=2){
 			register double reg1=0,reg2=0,reg3=0,reg4=0;
-			for(int k=0;k<n;k+=2){
+			for(k=0;k<n;k+=2){
 				register int indA00=i*n+k,indB00=k*n+j;
 				register int indA10=indA00+n,indB10=indB00+n;
 				register double a00=A[indA00],a01=A[indA00+1],a10=A[indA10],a11=A[indA10+1];
@@ -278,10 +281,10 @@ void jki(const double *A, const double *B, double *C, const int n) {
     int j = 0;
     int i = 0;
     int k = 0;
-    for(int j=0;j<n;j++){
-		for(int k=0;k<n;k++){
+    for(j=0;j<n;j++){
+		for(k=0;k<n;k++){
 			register double res=B[k*n+j];
-			for(int i=0;i<n;i++){
+			for(i=0;i<n;i++){
 				C[i*n+j]+=res*A[i*n+k];
 			}
 		}
