@@ -40,9 +40,26 @@ void dgemm1(const double *A, const double *B, double *C, const int n)
 //Register Reuse part 1 End
 
 //Register Reuse part 2
-void dgemm2(const double *A, const double *B, double *C, const int n) 
-{
-
+void dgemm2(const double *A, const double *B, double *C, const int n) {
+    for(int i=0;i<n;i+=2){
+		for(int j=0;j<n;j+=2){
+			register double reg1=0,reg2=0,reg3=0,reg4=0;
+			for(int k=0;k<n;k+=2){
+				register int indA00=i*n+k,indB00=k*n+j;
+				register int indA10=indA00+n,indB10=indB00+n;
+				register double a00=A[indA00],a01=A[indA00+1],a10=A[indA10],a11=A[indA10+1];
+				register double b00=B[indB00],b01=B[indB00+1],b10=B[indB10],b11=B[indB10+1];
+				reg1+=a00*b00+a01*b10;
+				reg2+=a00*b01+a01*b11;
+				reg3+=a10*b00+a11*b10;
+				reg4+=a10*b01+a11*b11;
+			}
+			C[i*n+j]=reg1;
+			C[i*n+j+1]=reg2;
+			C[(i+1)*n+j]=reg3;
+			C[(i+1)*n+j+1]=reg4;
+		}
+    }
 }
 //Register Reuse part 2 End
 
@@ -119,60 +136,165 @@ void ijk(const double *A, const double *B, double *C, const int n){
     }
 }
 
-void bijk(const double *A, const double *B, double *C, const int n, const int b) 
-{
-
+void bijk(const double *A, const double *B, double *C, const int n, const int b) {
+	for(int i=0;i<n;i+=b){
+		for(int j=0;j<n;j+=b){
+			for(int k=0;k<n;k+=b){
+				for(int iB=i;iB<i+b && iB<n;iB++){
+					for(int jB=j;jB<j+b && jB<n;jB++){
+						register double res=C[iB*n+jB];
+						for(int kB=k;kB<k+b && kB<n;kB++){
+							res+=A[iB*n+kB]*B[kB*n+jB];
+                        }
+					    C[iB*n+jB]=res;
+					}
+                }
+			}
+        }
+    }
 }
 
-void jik(const double *A, const double *B, double *C, const int n) 
-{
-
+void jik(const double *A, const double *B, double *C, const int n) {
+    for(int j=0;j<n;j++){
+        for(int i=0;i<n;i++){
+			register double res=0;
+			for(int k=0;k<n;k++){
+				res+=A[i*n+k]*B[k*n+j];
+			}
+			C[i*n+j]=res;
+		}
+    }
 }
 
-void bjik(const double *A, const double *B, double *C, const int n, const int b) 
-{
-
+void bjik(const double *A, const double *B, double *C, const int n, const int b) {
+    for(int j=0;j<n;j+=b){
+		for(int i=0;i<n;i+=b){	
+			for(int k=0;k<n;k+=b){
+				for(int jB=j;jB<j+b && jB<n;jB++){
+					for(int iB=i;iB<i+b && iB<n;iB++){
+						register double res=C[iB*n+jB];
+						for(int kB=k;kB<k+b && kB<n;kB++){
+							res+=A[iB*n+kB]*B[kB*n+jB];
+                        }
+						C[iB*n+jB]=res;
+					}
+                }
+			}
+        }
+    }
 }
 
-void kij(const double *A, const double *B, double *C, const int n) 
-{
-
+void kij(const double *A, const double *B, double *C, const int n) {
+    for(int k=0;k<n;k++){
+		for(int i=0;i<n;i++){
+			register double res=A[i*n+k];
+			for(int j=0;j<n;j++){
+				C[i*n+j]+=res*B[k*n+j];
+			}
+		}
+    }
 }
 
-void bkij(const double *A, const double *B, double *C, const int n, const int b) 
-{
-
+void bkij(const double *A, const double *B, double *C, const int n, const int b) {
+    for(int k=0;k<n;k+=b){
+		for(int i=0;i<n;i+=b){	
+			for(int j=0;j<n;j+=b){
+				for(int kB=k;kB<k+b && kB<n;kB++){
+					for(int iB=i;iB<i+b && iB<n;iB++){
+						register double res=A[iB*n+kB];
+						for(int jB=j;jB<j+b && jB<n;jB++){
+							C[iB*n+jB]+=res*B[kB*n+jB];
+                        }
+					}
+                }
+			}
+        }
+    }
 }
 
 
-void ikj(const double *A, const double *B, double *C, const int n) 
-{
-
+void ikj(const double *A, const double *B, double *C, const int n) {
+    for(int k=0;k<n;k++){
+		for(int i=0;i<n;i++){
+			register double res=A[i*n+k];
+			for(int j=0;j<n;j++){
+				C[i*n+j]+=res*B[k*n+j];
+			}
+		}
+    }
 }
 
-void bikj(const double *A, const double *B, double *C, const int n, const int b) 
-{
-
+void bikj(const double *A, const double *B, double *C, const int n, const int b) {
+    for(int i=0;i<n;i+=b){
+		for(int k=0;k<n;k+=b){	
+			for(int j=0;j<n;j+=b){
+				for(int iB=i;iB<i+b && iB<n;iB++){
+					for(int kB=k;kB<k+b && kB<n;kB++){
+						register double res=A[iB*n+kB];
+						for(int jB=j;jB<j+b && jB<n;jB++){
+							C[iB*n+jB]+=res*B[kB*n+jB];
+                        }
+					}
+                }
+			}
+        }
+    }
 }
 
-void jki(const double *A, const double *B, double *C, const int n) 
-{
-
+void jki(const double *A, const double *B, double *C, const int n) {
+    for(int j=0;j<n;j++){
+		for(int k=0;k<n;k++){
+			register double res=B[k*n+j];
+			for(int i=0;i<n;i++){
+				C[i*n+j]+=res*A[i*n+k];
+			}
+		}
+    }
 }
 
-void bjki(const double *A, const double *B, double *C, const int n, const int b) 
-{
-
+void bjki(const double *A, const double *B, double *C, const int n, const int b) {
+    for(int j=0;j<n;j+=b){
+		for(int k=0;k<n;k+=b){
+			for(int i=0;i<n;i+=b){
+				for(int jB=j;jB<j+b && jB<n;jB++){
+					for(int kB=k;kB<k+b && kB<n;kB++){
+						register double res=B[kB*n+jB];
+						for(int iB=i;iB<i+b && iB<n;iB++){
+							C[iB*n+jB]+=res*A[iB*n+kB];
+                        }
+					}
+                }
+			}
+        }
+    }
 }
 
-void kji(const double *A, const double *B, double *C, const int n) 
-{
-
+void kji(const double *A, const double *B, double *C, const int n) {
+    for(int j=0;j<n;j++){
+		for(int k=0;k<n;k++){
+			register double res=B[k*n+j];
+			for(int i=0;i<n;i++){
+				C[i*n+j]+=res*A[i*n+k];
+			}
+		}
+    }
 }
 
-void bkji(const double *A, const double *B, double *C, const int n, const int b) 
-{
-
+void bkji(const double *A, const double *B, double *C, const int n, const int b) {
+    for(int k=0;k<n;k+=b){
+		for(int j=0;j<n;j+=b){	
+			for(int i=0;i<n;i+=b){
+				for(int kB=k;kB<k+b && kB<n;kB++){
+					for(int jB=j;jB<j+b && jB<n;jB++){
+						register double res=B[kB*n+jB];
+						for(int iB=i;iB<i+b && iB<n;iB++){
+							C[iB*n+jB]+=res*A[iB*n+kB];
+                        }
+					}
+                }
+			}
+        }
+    }
 }
 //Cache Reuse part 3 End 
 
