@@ -35,19 +35,16 @@ void dgemm3(const double *A, const double *B, double *C, const int n)
 //Register Reuse part 3 End
 
 //Cache Reuse part 3
-void ijk(const double *A, const double *B, double *C, const int n) 
-{
-for(int i=0;i<n;i++)
-		for(int j=0;j<n;j++)
-		{
-			register double res=0;
-			for(int k=0;k<n;k++)
-			{
-				res+=A[i*n+k]*B[k*n+j];
-		
-			}
-			C[i*n+j]=res;
-		}
+void ijk(const double *A, const double *B, double *C, const int n){
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            register double res=0;
+            for(int k=0;k<n;k++){
+                res+=A[i*n+k]*B[k*n+j];
+            }
+            C[i*n+j]=res;
+        }       
+    }
 }
 
 void bijk(const double *A, const double *B, double *C, const int n, const int b) 
