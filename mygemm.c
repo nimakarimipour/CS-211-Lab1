@@ -44,24 +44,31 @@ void dgemm2(const double *A, const double *B, double *C, const int n) {
     int i = 0;
     int j = 0;
     int k = 0;
-    for(i=0;i<n;i+=2){
-		for(j=0;j<n;j+=2){
-			register double reg1=0,reg2=0,reg3=0,reg4=0;
-			for(k=0;k<n;k+=2){
-				register int indA00=i*n+k,indB00=k*n+j;
-				register int indA10=indA00+n,indB10=indB00+n;
-				register double a00=A[indA00],a01=A[indA00+1],a10=A[indA10],a11=A[indA10+1];
-				register double b00=B[indB00],b01=B[indB00+1],b10=B[indB10],b11=B[indB10+1];
-				reg1+=a00*b00+a01*b10;
-				reg2+=a00*b01+a01*b11;
-				reg3+=a10*b00+a11*b10;
-				reg4+=a10*b01+a11*b11;
-			}
-			C[i*n+j]=reg1;
-			C[i*n+j+1]=reg2;
-			C[(i+1)*n+j]=reg3;
-			C[(i+1)*n+j+1]=reg4;
-		}
+    for (i = 0; i < n; i += 2){
+        for (j = 0; j < n; j += 2){
+            register double C_0_0 = C[i * n + j];
+            register double C_1_0 = i < (n - 1) ? C[(i + 1) * n + j] : 0;
+            register double C_0_1 = j < (n - 1) ? C[i * n + (j + 1)] : 0;
+            register double C_1_1 = (i < (n - 1)) && (j < (n - 1))? C[(i + 1) * n + (j + 1)] : 0;
+            for (k = 0; k < n; k += 2){
+                register double A_0_0 = A[i * n + k];
+                register double A_1_0 = i < (n - 1) ? A[(i + 1) * n + k] : 0;
+                register double A_0_1 = k < (n - 1) ? A[i * n + (k + 1)] : 0;
+                register double A_1_1 = (i < (n - 1)) && (k < (n - 1)) ? A[(i + 1) * n + (k + 1)] : 0;
+                register double B_0_0 = B[k * n + j];
+                register double B_1_0 = k < (n - 1) ? B[(k + 1) * n + j] : 0;
+                register double B_0_1 = j < (n - 1) ? B[k * n + (j + 1)] : 0;
+                register double B_1_1 = (k < (n - 1)) && (j < (n - 1)) ? B[(k + 1) * n + (j + 1)] : 0;
+                C_0_0 += A_0_0 * B_0_0 + A_0_1 * B_1_0;
+                C_1_0 += A_1_0 * B_0_0 + A_1_1 * B_1_0;
+                C_0_1 += A_0_0 * B_0_1 + A_0_1 * B_1_1;
+                C_1_1 += A_1_0 * B_0_1 + A_1_1 * B_1_1;
+            }
+            C[i * n + j] = C_0_0;
+            if (i < (n - 1)) C[(i + 1) * n + j] = C_1_0;
+            if (j < (n - 1)) C[i * n + (j + 1)] = C_0_1;
+            if (i < (n - 1) && j < (n - 1)) C[(i + 1) * n + (j + 1)] = C_1_1;
+        }
     }
 }
 //Register Reuse part 2 End
