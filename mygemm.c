@@ -241,10 +241,10 @@ void ikj(const double *A, const double *B, double *C, const int n) {
     int j = 0;
     int i = 0;
     int k = 0;
-    for(int k=0;k<n;k++){
-		for(int i=0;i<n;i++){
+    for(k=0;k<n;k++){
+		for(i=0;i<n;i++){
 			register double res=A[i*n+k];
-			for(int j=0;j<n;j++){
+			for(j=0;j<n;j++){
 				C[i*n+j]+=res*B[k*n+j];
 			}
 		}
@@ -315,10 +315,10 @@ void kji(const double *A, const double *B, double *C, const int n) {
     int j = 0;
     int i = 0;
     int k = 0;
-    for(int j=0;j<n;j++){
-		for(int k=0;k<n;k++){
+    for(j=0;j<n;j++){
+		for(k=0;k<n;k++){
 			register double res=B[k*n+j];
-			for(int i=0;i<n;i++){
+			for(i=0;i<n;i++){
 				C[i*n+j]+=res*A[i*n+k];
 			}
 		}
