@@ -19,7 +19,7 @@
 
 int main(int argc, char *argv[])
 {
-    printf("\n**********  * Cache reuse ***********\n");
+    printf("\n**********  * Cache reuseeeeeeee ***********\n");
     int i, j;
     int b;
     char *func_name_cache[] = {"ijk ", "jik ", "kij ", "ikj ", "jki ", "kji ",
