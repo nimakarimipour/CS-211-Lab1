@@ -40,16 +40,13 @@ void ijk(const double *A, const double *B, double *C, const int n){
     int j = 0;
     int k = 0;
     for(i=0;i<n;i++){
-		for(j=0;j<n;j++)
-		{
-			register double res=0;
-			for(k=0;k<n;k++)
-			{
-				res+=A[i*n+k]*B[k*n+j];
-		
-			}
-			C[i*n+j]=res;
-		}
+        for(j=0;j<n;j++){
+            register double res=0;
+            for(k=0;k<n;k++){
+                res+=A[i*n+k]*B[k*n+j];
+            }
+            C[i*n+j]=res;
+        }       
     }
 }
 
@@ -78,17 +75,14 @@ void bijk(const double *A, const double *B, double *C, const int n, const int b)
 }
 
 void jik(const double *A, const double *B, double *C, const int n) {
-    int i = 0;
     int j = 0;
+    int i = 0;
     int k = 0;
     for(j=0;j<n;j++){
-		for(i=0;i<n;i++)
-		{
+        for(i=0;i<n;i++){
 			register double res=0;
-			for(k=0;k<n;k++)
-			{
+			for(k=0;k<n;k++){
 				res+=A[i*n+k]*B[k*n+j];
-		
 			}
 			C[i*n+j]=res;
 		}
