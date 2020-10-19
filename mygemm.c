@@ -21,8 +21,7 @@ void dgemm0(const double* A, const double* B, double* C, const int n){
     }
 }
 
-void dgemm1(const double *A, const double *B, double *C, const int n) 
-{
+void dgemm1(const double *A, const double *B, double *C, const int n) {
     int i = 0;
     int j = 0;
     int k = 0;
@@ -40,33 +39,61 @@ void dgemm1(const double *A, const double *B, double *C, const int n)
 
 //Register Reuse part 2
 void dgemm2(const double *A, const double *B, double *C, const int n) {
-    int i = 0;
-    int j = 0;
-    int k = 0;
-    for (i = 0; i < n; i += 2){
-        for (j = 0; j < n; j += 2){
-            register double C_0_0 = C[i * n + j];
-            register double C_1_0 = i < (n - 1) ? C[(i + 1) * n + j] : 0;
-            register double C_0_1 = j < (n - 1) ? C[i * n + (j + 1)] : 0;
-            register double C_1_1 = (i < (n - 1)) && (j < (n - 1))? C[(i + 1) * n + (j + 1)] : 0;
-            for (k = 0; k < n; k += 2){
-                register double A_0_0 = A[i * n + k];
-                register double A_1_0 = i < (n - 1) ? A[(i + 1) * n + k] : 0;
-                register double A_0_1 = k < (n - 1) ? A[i * n + (k + 1)] : 0;
-                register double A_1_1 = (i < (n - 1)) && (k < (n - 1)) ? A[(i + 1) * n + (k + 1)] : 0;
-                register double B_0_0 = B[k * n + j];
-                register double B_1_0 = k < (n - 1) ? B[(k + 1) * n + j] : 0;
-                register double B_0_1 = j < (n - 1) ? B[k * n + (j + 1)] : 0;
-                register double B_1_1 = (k < (n - 1)) && (j < (n - 1)) ? B[(k + 1) * n + (j + 1)] : 0;
-                C_0_0 += A_0_0 * B_0_0 + A_0_1 * B_1_0;
-                C_1_0 += A_1_0 * B_0_0 + A_1_1 * B_1_0;
-                C_0_1 += A_0_0 * B_0_1 + A_0_1 * B_1_1;
-                C_1_1 += A_1_0 * B_0_1 + A_1_1 * B_1_1;
+    int i=0;
+    int j=0;
+    int k=0;
+    for (i=0;i<n;i+=2){
+        for (j=0;j<n;j+=2){
+            register double C00=C[i*n+j];
+            register double C10=0;
+            if(i<(n-1)){
+                C10=C[(i+1)*n+j];
             }
-            C[i * n + j] = C_0_0;
-            if (i < (n - 1)) C[(i + 1) * n + j] = C_1_0;
-            if (j < (n - 1)) C[i * n + (j + 1)] = C_0_1;
-            if (i < (n - 1) && j < (n - 1)) C[(i + 1) * n + (j + 1)] = C_1_1;
+            register double C01=0;
+            if(j<(n-1)){
+                C01 = C[i*n+(j+1)];
+            }
+            register double C11=0;
+            if((i<(n-1))&&(j<(n-1))){
+                C11 = C[(i+1)*n+(j+1)];
+            }
+            for (k=0;k<n;k += 2){
+                register double A00=A[i*n+k];
+                register double B00=B[k*n+j];
+                register double A10=0; 
+                register double A01=0;
+                register double B11=0; 
+                register double B01=0;
+                register double B10=0; 
+                register double A11=0; 
+                if(k<(n-1)){
+                    A01=A[i*n+(k+1)];
+                }
+                if(i<(n-1)){
+                    A10=A[(i+1)*n+k];
+                }
+                if((i<(n-1))&&(k<(n-1))){
+                    A11=A[(i+1)*n+(k+1)];
+                }
+                if(k<(n-1)){
+                    B10=B[(k+1)*n+j];
+                }
+                if(j<(n-1)){
+                    B01=B[k*n+(j+1)];
+                }
+
+                if((k<(n-1))&&(j<(n-1))){
+                    B11=B[(k+1)*n+(j+1)];
+                }
+                C00+=A00*B00+A01*B10;
+                C01+=A00*B01+A01*B11;
+                C10+=A10*B00+A11*B10;
+                C11+=A10*B01+A11*B11;
+            }
+            C[i*n+j]=C00;
+            if (i<(n-1))C[(i+1)*n+j]=C10;
+            if (j<(n-1))C[i*n+(j+1)]=C01;
+            if (i<(n-1)&&j<(n-1))C[(i+1)*n+(j+1)]=C11;
         }
     }
 }
@@ -77,20 +104,53 @@ void dgemm3(const double *A, const double *B, double *C, const int n) {
     int i = 0;
     int j = 0;
     int k = 0;
-    for (i = 0; i < n; i += 3){
-        for (j = 0; j < n; j += 4){
-            register double C00 = C[i * n + j];
-            register double C10 = i < (n - 1) ? C[(i + 1) * n + j] : 0;
-            register double C20 = i < (n - 2) ? C[(i + 2) * n + j] : 0;
-            register double C01 = j < (n - 1) ? C[i * n + (j + 1)] : 0;
-            register double C11 = i < (n - 1) && j < (n - 1) ? C[(i + 1) * n + (j + 1)] : 0;
-            register double C21 = i < (n - 2) && j < (n - 1) ? C[(i + 2) * n + (j + 1)] : 0;
-            register double C02 = j < (n - 2) ? C[i * n + (j + 2)] : 0;
-            register double C12 = i < (n - 1) && j < (n - 2) ? C[(i + 1) * n + (j + 2)] : 0;
-            register double C22 = i < (n - 2) && j < (n - 2) ? C[(i + 2) * n + (j + 2)] : 0;
-            register double C03 = j < (n - 3) ? C[i * n + (j + 3)] : 0;
-            register double C13 = i < (n - 1) && j < (n - 3) ? C[(i + 1) * n + (j + 3)] : 0;
-            register double C23 = i < (n - 2) && j < (n - 3) ? C[(i + 2) * n + (j + 3)] : 0;
+    for(i=0;i<n;i+=3){
+        for(j=0;j<n;j+=4){
+            register double C00=C[i*n+j];
+            register double C10=0;
+            register double C20=0;
+            register double C01=0; 
+            register double C11=0; 
+            register double C21=0; 
+            register double C02=0; 
+            register double C12=0;
+            register double C22=0;
+            register double C03=0;
+            register double C13=0;  
+            register double C23=0; 
+            if(i<(n-1)){
+                C10=C[(i+1)*n+j];
+            }
+            if(i<(n-2)){
+                C20=C[(i+2)*n+j];
+            }
+            if(j<(n-1)){
+                C01=C[i*n+(j+1)];
+            }
+            if(i<(n-1)&&j<(n-1)){
+                C11=C[(i+1)*n+(j+1)];
+            }
+            if(i<(n-2)&&j<(n-1)){
+                C21=C[(i+2)*n+(j+1)];
+            }
+            if(j<(n-2)){
+                C02=C[i*n+(j+2)];
+            }
+            if(i<(n-1)&&j<(n-2)){ 
+                C12=C[(i+1)*n+(j+2)];
+            }
+            if(i<(n-2)&&j<(n-2)){
+                C22=C[(i+2)*n+(j+2)];
+            }
+            if(j<(n-3)){
+                C03=C[i*n+(j+3)];
+            }
+            if(i<(n-1)&&j<(n-3)){
+                C13=C[(i+1)*n+(j+3)];
+            }
+            if(i<(n-2)&&j<(n-3)){
+                C23=C[(i+2)*n+(j+3)];
+            }
             for (k = 0; k < n; k++){
                 register double A0M = A[i * n + k];
                 register double A1M = i < (n - 1) ? A[(i + 1) * n + k] : 0;
